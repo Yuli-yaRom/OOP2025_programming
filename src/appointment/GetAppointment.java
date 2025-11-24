@@ -1,5 +1,5 @@
-package hospital;
-
+package appointment;
+//
 public interface GetAppointment {
     boolean set_appointment(int date, int time);
     boolean cancel();

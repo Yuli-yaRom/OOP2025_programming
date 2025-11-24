@@ -1,40 +1,49 @@
-package hospital;
+package appointment;
+//Абстрактний клас, відповідальний за прийоми
+import people.Doctor;
+import people.Patient;
 
 import java.time.LocalDateTime;
 
-public class Appointment implements GetAppointment {
+public abstract class Appointment implements GetAppointment
+{
     private final Doctor doctor;
     private final Patient patient;
     private final LocalDateTime appointmentDateTime;
     private AppointmentStatus status;
 
-    public Appointment(Doctor doctor, Patient patient, LocalDateTime appointmentDateTime) {
+    public Appointment(Doctor doctor, Patient patient, LocalDateTime appointmentDateTime)
+    {
         this.doctor = doctor;
         this.patient = patient;
         this.appointmentDateTime = appointmentDateTime;
         this.status = AppointmentStatus.SCHEDULED;
     }
 
-    public Doctor getDoctor() {
+    public Doctor getDoctor()
+    {
         return doctor;
     }
 
-    public Patient getPatient() {
+    public Patient getPatient()
+    {
         return patient;
     }
 
-    public LocalDateTime getAppointmentDateTime() {
+    public LocalDateTime getAppointmentDateTime()
+    {
         return appointmentDateTime;
     }
 
-    public AppointmentStatus getStatus() {
+    public AppointmentStatus getStatus()
+    {
         return status;
     }
 
 
     @Override
     public boolean set_appointment(int date, int time) {
-        System.out.println(" ");
+        System.out.println("Appointment set");
         return false;
     }
 
@@ -49,7 +58,7 @@ public class Appointment implements GetAppointment {
 
     @Override
     public boolean complete() {
-        if (this.status == AppointmentStatus.SCHEDULED) {
+        if (this.status == AppointmentStatus.IN_PROGRESS) {
             this.status = AppointmentStatus.COMPLETED;
             return true;
         }
