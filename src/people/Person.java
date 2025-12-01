@@ -1,18 +1,18 @@
 package people;
 
+import java.util.UUID;
+
 public abstract class Person {
     private String name;
-    private Integer age;
     private String surname;
     private int phone;
+    private String email;
 
-    public Person(String name, String surname, int phone) {
+    public Person(String name, String surname, int phone, String email) {
         this.name = name;
         this.surname = surname;
         this.phone = phone;
-    }
-
-    protected Person() {
+        this.email = email;
     }
 
     public String getName() {
@@ -21,12 +21,6 @@ public abstract class Person {
 
     public void setName(String name) {
         this.name = name;
-    }
-    public Integer getAge() {
-        return age;
-    }
-    public void setAge(Integer age) {
-        this.age = age;
     }
 
     public String getSurname() {
@@ -42,5 +36,13 @@ public abstract class Person {
 
     public void setPhone(int phone) {
         this.phone = phone;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 }

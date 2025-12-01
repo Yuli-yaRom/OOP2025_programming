@@ -6,12 +6,16 @@ import people.Patient;
 import java.time.LocalDateTime;
 
 public class OfflineAppointment extends Appointment {
-
     private String roomNumber;
 
-    public OfflineAppointment(Doctor doctor, Patient patient, LocalDateTime appointmentDateTime, String roomNumber) {
-        super(doctor, patient, appointmentDateTime);
+    public OfflineAppointment(int appointmentId, Patient patient, Doctor doctor, LocalDateTime appointmentDateTime, String roomNumber, double cost) {
+        super(appointmentId, patient, doctor, appointmentDateTime, cost);
         this.roomNumber = roomNumber;
+    }
+
+    @Override
+    public void reschedule(LocalDateTime newDateTime) {
+        this.appointmentDateTime = newDateTime;
     }
 
     public String getRoomNumber() {

@@ -5,19 +5,19 @@ import people.Patient;
 
 import java.time.LocalDateTime;
 
+
 public class OnlineAppointment extends Appointment {
     private String meetingLink;
 
-    public OnlineAppointment(Doctor doctor, Patient patient, LocalDateTime appointmentDateTime, String meetingLink) {
-        super(doctor, patient, appointmentDateTime);
+    public OnlineAppointment(int appointmentId, Patient patient, Doctor doctor, LocalDateTime appointmentDateTime, String meetingLink, double cost) {
+        super(appointmentId, patient, doctor, appointmentDateTime, cost);
         this.meetingLink = meetingLink;
     }
 
-    public String getMeetingLink() {
-        return meetingLink;
-    }
-
-    public void setMeetingLink(String meetingLink) {
-        this.meetingLink = meetingLink;
+    @Override
+    public void reschedule(LocalDateTime newDateTime) {
+        this.appointmentDateTime = newDateTime;
     }
 }
+
+

@@ -1,27 +1,33 @@
 package people;
 
 import appointment.Appointment;
-import hospital.MedicalRecordEntry;
+import hospital.MedicalRecord;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 public class Patient extends Person {
-    private final List<MedicalRecordEntry> medicalRecords;
-    private final List<Appointment> appointments;
+    private int patientId;
+    private final List<MedicalRecord> medicalRecords;
 
-    public Patient(String name, String surname, int phone, List<MedicalRecordEntry> medicalRecords) {
-        super(name, surname, phone);
+    public Patient(String name, String surname, int phone, List<MedicalRecord> medicalRecords, String email) {
+        super(name, surname, phone, email);
+        this.patientId = patientId;
         this.medicalRecords = new ArrayList<>();
-        this.appointments = new ArrayList<>();
     }
-    public List<MedicalRecordEntry> getMedicalRecords() {
+    public List<MedicalRecord> getMedicalRecords() {
+
         return Collections.unmodifiableList(medicalRecords);
     }
+    public int getPatientId() {
 
-    public List<Appointment> getAppointments() {
-        return Collections.unmodifiableList(appointments);
+        return patientId;
+    }
+
+    public void setPatientId(int patientId) {
+
+        this.patientId = patientId;
     }
 
     public void scheduleAppointment(Appointment appointment) {

@@ -2,66 +2,58 @@ package appointment;
 //Абстрактний клас, відповідальний за прийоми
 import people.Doctor;
 import people.Patient;
-
 import java.time.LocalDateTime;
 
-public abstract class Appointment implements GetAppointment
-{
-    private final Doctor doctor;
-    private final Patient patient;
-    private final LocalDateTime appointmentDateTime;
-    private AppointmentStatus status;
 
-    public Appointment(Doctor doctor, Patient patient, LocalDateTime appointmentDateTime)
-    {
-        this.doctor = doctor;
+public abstract class Appointment {
+    protected int appointmentId;
+    protected Patient patient;
+    protected Doctor doctor;
+    protected LocalDateTime appointmentDateTime;
+    protected double cost;
+    protected AppointmentStatus status;
+
+    public Appointment(int appointmentId, Patient patient, Doctor doctor, LocalDateTime appointmentDateTime, double cost) {
+        this.appointmentId = appointmentId;
         this.patient = patient;
+        this.doctor = doctor;
         this.appointmentDateTime = appointmentDateTime;
+        this.cost = cost;
         this.status = AppointmentStatus.SCHEDULED;
     }
 
-    public Doctor getDoctor()
-    {
-        return doctor;
+    public double getCost() {
+        return cost;
     }
 
-    public Patient getPatient()
-    {
+    public Patient getPatient() {
         return patient;
     }
 
-    public LocalDateTime getAppointmentDateTime()
-    {
-        return appointmentDateTime;
+    public Doctor getDoctor() {
+        return doctor;
     }
 
-    public AppointmentStatus getStatus()
-    {
+    public AppointmentStatus getStatus() {
         return status;
     }
 
-
-    @Override
-    public boolean set_appointment(int date, int time) {
-        System.out.println("Appointment set");
-        return false;
+    public void schedule() {
+        this.status = AppointmentStatus.SCHEDULED;
     }
 
-    @Override
-    public boolean cancel() {
-        if (this.status == AppointmentStatus.SCHEDULED) {
-            this.status = AppointmentStatus.CANCELED;
-            return true;
-        }
-        return false;
+    public void cancel() {
+        this.status = AppointmentStatus.CANCELED;
     }
 
-    @Override
-    public boolean complete() {
-        if (this.status == AppointmentStatus.IN_PROGRESS) {
-            this.status = AppointmentStatus.COMPLETED;
-            return true;
-        }
-        return false;
+    public void setStatus(AppointmentStatus status) {
+        this.status = status;
     }
+
+    public LocalDateTime getAppointmentDateTime() {
+        return appointmentDateTime;
+    }
+
+    public abstract void reschedule(LocalDateTime newDateTime);
 }
+
