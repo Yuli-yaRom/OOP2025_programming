@@ -2,7 +2,6 @@ package appointment;
 // Онлайн прийом наслідує прийом
 import people.Doctor;
 import people.Patient;
-
 import java.time.LocalDateTime;
 
 
@@ -16,6 +15,7 @@ public class OnlineAppointment extends Appointment {
 
     @Override
     public void reschedule(LocalDateTime newDateTime) {
+
         this.appointmentDateTime = newDateTime;
     }
 }

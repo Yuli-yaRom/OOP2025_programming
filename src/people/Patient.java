@@ -9,16 +9,15 @@ import java.util.List;
 
 public class Patient extends Person {
     private int patientId;
-    private final List<MedicalRecord> medicalRecords;
+    private final List<MedicalRecord> medicalHistory;
 
-    public Patient(String name, String surname, int phone, List<MedicalRecord> medicalRecords, String email) {
-        super(name, surname, phone, email);
-        this.patientId = patientId;
-        this.medicalRecords = new ArrayList<>();
+    public Patient(int Id, String name, String surname, int phone, String email) {
+        super(Id, name, surname, phone, email);
+        this.medicalHistory = new ArrayList<>();
     }
-    public List<MedicalRecord> getMedicalRecords() {
+    public List<MedicalRecord> getMedicalHistory() {
 
-        return Collections.unmodifiableList(medicalRecords);
+        return medicalHistory;
     }
     public int getPatientId() {
 
@@ -33,4 +32,10 @@ public class Patient extends Person {
     public void scheduleAppointment(Appointment appointment) {
        //if slot is available add appointment
     }
+
+    public void addMedicalRecord(MedicalRecord record) {
+        this.medicalHistory.add(record);
+    }
+
+
 }

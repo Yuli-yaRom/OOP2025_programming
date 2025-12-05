@@ -1,8 +1,5 @@
 package hospital;
-
 import people.Doctor;
-
-
 import java.time.LocalDateTime;
 
 public class MedicalRecord {
@@ -18,6 +15,7 @@ public class MedicalRecord {
 
     @Override
     public String toString() {
+
         return "Record on " + date + " by " + doctor.getName() + ": " + description;
     }
 }

@@ -23,34 +23,42 @@ public abstract class Appointment {
     }
 
     public double getCost() {
+
         return cost;
     }
 
     public Patient getPatient() {
+
         return patient;
     }
 
     public Doctor getDoctor() {
+
         return doctor;
     }
 
     public AppointmentStatus getStatus() {
+
         return status;
     }
 
     public void schedule() {
+
         this.status = AppointmentStatus.SCHEDULED;
     }
 
     public void cancel() {
+
         this.status = AppointmentStatus.CANCELED;
     }
 
     public void setStatus(AppointmentStatus status) {
+
         this.status = status;
     }
 
     public LocalDateTime getAppointmentDateTime() {
+
         return appointmentDateTime;
     }
 

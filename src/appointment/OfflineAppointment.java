@@ -2,7 +2,6 @@ package appointment;
 // Оффлайн прийом наслідує прийом
 import people.Doctor;
 import people.Patient;
-
 import java.time.LocalDateTime;
 
 public class OfflineAppointment extends Appointment {
@@ -15,14 +14,17 @@ public class OfflineAppointment extends Appointment {
 
     @Override
     public void reschedule(LocalDateTime newDateTime) {
+
         this.appointmentDateTime = newDateTime;
     }
 
     public String getRoomNumber() {
+
         return roomNumber;
     }
 
     public void setRoomNumber(String roomNumber) {
+
         this.roomNumber = roomNumber;
     }
 }

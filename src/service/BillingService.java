@@ -1,5 +1,7 @@
 package service;
 // Charge patient for completed appointment
-public class BillingService {
 
+public interface BillingService {
+    double calculateCost();
 }
+
