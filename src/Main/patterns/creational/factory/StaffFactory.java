@@ -5,6 +5,8 @@ import Main.exceptions.InvalidInputException;
 import Main.people.Doctor;
 import Main.people.Person;
 
+//Фабрика персоналу
+
 public class StaffFactory {
     public static Person createStaff(int id, String type, String name, String surname, String phone, String specialization, String email) {
         if ("doctor".equalsIgnoreCase(type)) {

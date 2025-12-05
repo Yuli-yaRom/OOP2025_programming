@@ -2,6 +2,8 @@ package Main.patterns.creational.factory;
 import Main.exceptions.InvalidInputException;
 import Main.hospital.Department;
 
+//Фабрика відділень
+
 public class DepartmentFactory {
     public static Department createDepartment(String name) throws InvalidInputException {
         Department department = new Department(name);

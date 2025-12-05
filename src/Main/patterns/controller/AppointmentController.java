@@ -15,7 +15,7 @@ import Main.people.Doctor;
 import java.time.LocalDateTime;
 import java.util.List;
 
-
+//Контролер прийомів
 
 public class AppointmentController {
     private final HospitalFacade hospitalFacade;
