@@ -27,7 +27,7 @@ public class Run {
         try {
             AppointmentController controller = new AppointmentController();
             setupInitialData(controller);
-
+            //Сповіщення для користувача
             Observer patientNotifier = message -> System.out.println("\n--- Patient Notification ---\n" + message);
             controller.addObserver(patientNotifier);
 
