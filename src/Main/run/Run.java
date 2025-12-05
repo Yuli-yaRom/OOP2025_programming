@@ -5,7 +5,6 @@ import Main.appointment.AppointmentStatus;
 import Main.appointment.OfflineAppointment;
 import Main.exceptions.*;
 import Main.hospital.Department;
-import Main.hospital.MedicalRecord;
 import Main.patterns.controller.AppointmentController;
 import Main.patterns.observer.Observer;
 import Main.people.Doctor;
@@ -19,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 public class Run {
     private static int appointmentIdCounter = 1;
@@ -26,14 +26,11 @@ public class Run {
     public static void main(String[] args) {
         try {
             AppointmentController controller = new AppointmentController();
-            // Заповнення системи початковими даними (пацієнти, лікарі)
             setupInitialData(controller);
 
-            // Додавання спостерігача для отримання системних сповіщень
             Observer patientNotifier = message -> System.out.println("\n--- Patient Notification ---\n" + message);
             controller.addObserver(patientNotifier);
 
-            // Головний цикл програми
             try (Scanner scanner = new Scanner(System.in)) {
                 while (true) {
                     printMenu();
@@ -67,216 +64,98 @@ public class Run {
                 }
             }
         } catch (InvalidInputException e) {
-
             System.out.println("Fatal error during application setup: " + e.getMessage());
         }
     }
 
-    /**
-     * метод для отримання числа (цілого) від користувача
-     */
+    //метод для вибору об'єкта зі списку
+    private static <T> T selectFromList(Scanner scanner, List<T> items, String title, Function<T, String> displayMapper) {
+        System.out.println("--- " + title + " ---");
+        if (items.isEmpty()) {
+            System.out.println("List is empty.");
+            return null;
+        }
+        for (int i = 0; i < items.size(); i++) {
+            System.out.println((i + 1) + ". " + displayMapper.apply(items.get(i)));
+        }
+        System.out.print("Enter number: ");
+        int index = getIntegerInput(scanner);
+        if (index < 1 || index > items.size()) {
+            System.out.println("Invalid selection.");
+            return null;
+        }
+        return items.get(index - 1);
+    }
+
     private static int getIntegerInput(Scanner scanner) {
         while (true) {
             try {
-                int choice = scanner.nextInt();
-                scanner.nextLine();
-                return choice;
-            } catch (java.util.InputMismatchException e) {
-                System.out.println("Invalid input. Please enter a number.");
-                scanner.nextLine();
+                String line = scanner.nextLine();
+                return Integer.parseInt(line.trim());
+            } catch (NumberFormatException e) {
+                System.out.print("Invalid input. Please enter a number: ");
             }
         }
     }
 
 
-    private static void printMenu() {
-        System.out.println("\n--- Hospital Management System ---");
-        System.out.println("1. Book an Appointment");
-        System.out.println("2. Cancel an Appointment");
-        System.out.println("3. Reschedule an Appointment");
-        System.out.println("4. Complete an Appointment");
-        System.out.println("5. Record Medical History");
-        System.out.println("6. View Patient Medical History");
-        System.out.println("7. Exit");
-        System.out.print("Enter your choice: ");
+     //пошук пацієнта
+    private static Patient findPatientInteractive(Scanner scanner, AppointmentController controller) {
+        System.out.print("Enter patient ID: ");
+        int patientId = getIntegerInput(scanner);
+        try {
+            return controller.findPatientById(patientId);
+        } catch (PatientNotFoundException e) {
+            System.out.println("Error: " + e.getMessage());
+            return null;
+        }
     }
 
-    /**
-     * Обробляє логіку запису на новий прийом
-     */
+    //Основна логіка
     private static void bookAppointment(Scanner scanner, AppointmentController controller) {
         System.out.print("Enter appointment type (online/offline): ");
         String type = scanner.nextLine();
-        System.out.print("Enter patient ID: ");
-        int patientId = getIntegerInput(scanner);
+
+        Patient patient = findPatientInteractive(scanner, controller);
+        if (patient == null) return;
+
+        Doctor doctor = selectDoctor(scanner, controller);
+        if (doctor == null) return;
+
+        LocalDateTime timeSlot = selectFromList(scanner, controller.getAvailableTimeSlots(), "Select a Time Slot", LocalDateTime::toString);
+        if (timeSlot == null) return;
+
+        String details;
+        double cost;
+
+        if ("offline".equalsIgnoreCase(type)) {
+            String room = selectRoomInteractive(scanner, controller);
+            if (room == null) return;
+            details = room;
+            cost = 150.0;
+        } else {
+            System.out.print("Enter meeting link: ");
+            details = scanner.nextLine();
+            cost = 100.0;
+        }
 
         try {
-
-            Patient patient = controller.findPatientById(patientId);
-            Doctor doctor = selectDoctor(scanner, controller);
-            if (doctor == null) {
-                return;
-            }
-
-            System.out.println("--- Select a Time Slot ---");
-            listTimeSlots(controller);
-            System.out.print("Enter time slot number: ");
-            int timeSlotNumber = getIntegerInput(scanner);
-            if (timeSlotNumber < 1 || timeSlotNumber > controller.getAvailableTimeSlots().size()) {
-                System.out.println("Invalid time slot number.");
-                return;
-            }
-            LocalDateTime timeSlot = controller.getAvailableTimeSlots().get(timeSlotNumber - 1);
-
-            String details;
-            double cost;
-
-            if ("offline".equalsIgnoreCase(type)) {
-                System.out.println("--- Select an Available Room ---");
-                listAvailableRooms(controller);
-                System.out.print("Enter room number: ");
-                details = scanner.nextLine();
-                cost = 150.0;
-            } else {
-                System.out.print("Enter meeting link: ");
-                details = scanner.nextLine();
-                cost = 100.0;
-            }
-
             Appointment newAppointment = controller.bookAppointment(type, appointmentIdCounter++, patient, doctor, timeSlot, details, cost);
             System.out.println("Appointment booked successfully!");
-            System.out.println("  Patient: " + newAppointment.getPatient().getName());
-            System.out.println("  Doctor: " + newAppointment.getDoctor().getName());
-            System.out.println("  Time: " + newAppointment.getAppointmentDateTime());
-        } catch (PatientNotFoundException | AppointmentBookingException | DoctorUnavailableException e) {
+            printAppointmentDetails(newAppointment);
+        } catch (AppointmentBookingException | DoctorUnavailableException e) {
             System.out.println("Error: " + e.getMessage());
         }
     }
-
-    private static Doctor selectDoctor(Scanner scanner, AppointmentController controller) {
-        System.out.println("--- Select a Department ---");
-        listDepartments(controller);
-        System.out.print("Enter department number: ");
-        int departmentNumber = getIntegerInput(scanner);
-        if (departmentNumber < 1 || departmentNumber > controller.getDepartments().size()) {
-            System.out.println("Invalid department number.");
-            return null;
-        }
-        Department department = controller.getDepartments().get(departmentNumber - 1);
-
-        System.out.println("--- Select a Doctor ---");
-        listDoctors(department);
-        System.out.print("Enter doctor number: ");
-        int doctorNumber = getIntegerInput(scanner);
-        if (doctorNumber < 1 || doctorNumber > department.getDoctors().size()) {
-            System.out.println("Invalid doctor number.");
-            return null;
-        }
-        Doctor selectedDoctor = department.getDoctors().get(doctorNumber - 1);
-        try {
-            return controller.findDoctorById(selectedDoctor.getId());
-        } catch (DoctorNotFoundException e) {
-            System.out.println("Error: " + e.getMessage());
-            return null;
-        }
-    }
-
-    /**
-     * метод для вибору запланованого прийому зі списку
-     */
-    private static Appointment selectAppointment(Scanner scanner, AppointmentController controller) {
-        System.out.println("--- Select a Scheduled Appointment ---");
-        List<Appointment> scheduledAppointments = new ArrayList<>();
-        for (Appointment appointment : controller.getAppointments()) {
-            if (appointment.getStatus() == AppointmentStatus.SCHEDULED) {
-                scheduledAppointments.add(appointment);
-            }
-        }
-
-        if (scheduledAppointments.isEmpty()) {
-            System.out.println("No scheduled appointments available.");
-            return null;
-        }
-
-        int i = 1;
-        for (Appointment appointment : scheduledAppointments) {
-            System.out.println(i++ + ". " + appointment.getPatient().getName() + " with " + appointment.getDoctor().getName() + " at " + appointment.getAppointmentDateTime() + " (" + appointment.getStatus() + ")");
-        }
-
-        System.out.print("Enter appointment number: ");
-        int appointmentNumber = getIntegerInput(scanner);
-        if (appointmentNumber < 1 || appointmentNumber > scheduledAppointments.size()) {
-            System.out.println("Invalid appointment number.");
-            return null;
-        }
-        return scheduledAppointments.get(appointmentNumber - 1);
-    }
-
-    /**
-     * Записує історію хвороби пацієнта
-     */
-    private static void recordMedicalHistory(Scanner scanner, AppointmentController controller) {
-        System.out.print("Enter patient ID: ");
-        int patientId = getIntegerInput(scanner);
-
-        try {
-            Patient patient = controller.findPatientById(patientId);
-            Doctor doctor = selectDoctor(scanner, controller);
-            if (doctor == null) {
-                return;
-            }
-            System.out.print("Enter medical record: ");
-            String record = scanner.nextLine();
-            controller.recordMedicalHistory(doctor, patient, record);
-            System.out.println("Medical record updated.");
-        } catch (PatientNotFoundException e) {
-            System.out.println("Error: " + e.getMessage());
-        }
-    }
-
-
-    private static void setupInitialData(AppointmentController controller) {
-        try {
-            controller.addPatient(new Patient(1, "John", "Doe", "123-456-7890", "John@gmail.com"));
-            controller.addPatient(new Patient(2, "Jane", "Smith", "234-444-111", "Jane@gmail.com"));
-        } catch (InvalidInputException e) {
-            System.out.println("Error setting up initial data: " + e.getMessage());
-        }
-    }
-
-    private static void performActionOnAppointment(Scanner scanner, AppointmentController controller, Consumer<Appointment> action) {
-        Appointment appointment = selectAppointment(scanner, controller);
-        if (appointment != null) {
-            action.accept(appointment);
-        }
-    }
-
-    private static void cancelAppointment(Scanner scanner, AppointmentController controller) {
-        performActionOnAppointment(scanner, controller, appointment -> {
-            controller.cancelAppointment(appointment);
-            System.out.println("Appointment for " + appointment.getPatient().getName() + " has been canceled.");
-        });
-    }
-
 
     private static void rescheduleAppointment(Scanner scanner, AppointmentController controller) {
         performActionOnAppointment(scanner, controller, appointment -> {
-            System.out.println("--- Select a New Time Slot ---");
-            listTimeSlots(controller);
-            System.out.print("Enter time slot number: ");
-            int timeSlotNumber = getIntegerInput(scanner);
-            if (timeSlotNumber < 1 || timeSlotNumber > controller.getAvailableTimeSlots().size()) {
-                System.out.println("Invalid time slot number.");
-                return;
-            }
-            LocalDateTime newTimeSlot = controller.getAvailableTimeSlots().get(timeSlotNumber - 1);
+            LocalDateTime newTimeSlot = selectFromList(scanner, controller.getAvailableTimeSlots(), "Select a New Time Slot", LocalDateTime::toString);
+            if (newTimeSlot == null) return;
 
             String newRoomNumber = null;
             if (appointment instanceof OfflineAppointment) {
-                System.out.println("--- Select a New Room ---");
-                listAvailableRooms(controller);
-                System.out.print("Enter new room number: ");
-                newRoomNumber = scanner.nextLine();
+                newRoomNumber = selectRoomInteractive(scanner, controller);
             }
 
             try {
@@ -288,6 +167,12 @@ public class Run {
         });
     }
 
+    private static void cancelAppointment(Scanner scanner, AppointmentController controller) {
+        performActionOnAppointment(scanner, controller, appointment -> {
+            controller.cancelAppointment(appointment);
+            System.out.println("Appointment for " + appointment.getPatient().getName() + " has been canceled.");
+        });
+    }
 
     private static void completeAppointment(Scanner scanner, AppointmentController controller) {
         performActionOnAppointment(scanner, controller, appointment -> {
@@ -295,6 +180,7 @@ public class Run {
             String paymentMethod = scanner.nextLine();
             PaymentStrategy paymentStrategy;
             boolean applyInsurance = false;
+
             if ("credit".equalsIgnoreCase(paymentMethod)) {
                 paymentStrategy = new CreditCardPayment("1234-5678-9012-3456");
             } else if ("insurance".equalsIgnoreCase(paymentMethod)) {
@@ -310,48 +196,101 @@ public class Run {
         });
     }
 
-    // Допоміжні методи для відображення
-    private static void listDepartments(AppointmentController controller) {
-        int i = 1;
-        for (Department department : controller.getDepartments()) {
-            System.out.println(i++ + ". " + department.getName());
-        }
-    }
+    private static void recordMedicalHistory(Scanner scanner, AppointmentController controller) {
+        Patient patient = findPatientInteractive(scanner, controller);
+        if (patient == null) return;
 
-    private static void listDoctors(Department department) {
-        int i = 1;
-        for (Doctor doctor : department.getDoctors()) {
-            System.out.println(i++ + ". " + doctor.getName() + " (" + doctor.getSpecialization() + ")");
-        }
-    }
+        Doctor doctor = selectDoctor(scanner, controller);
+        if (doctor == null) return;
 
-    private static void listTimeSlots(AppointmentController controller) {
-        int i = 1;
-        for (LocalDateTime timeSlot : controller.getAvailableTimeSlots()) {
-            System.out.println(i++ + ". " + timeSlot);
-        }
-    }
+        System.out.print("Enter medical record: ");
+        String record = scanner.nextLine();
 
-    private static void listAvailableRooms(AppointmentController controller) {
-        System.out.println("Available rooms: " + controller.getAvailableRooms());
+        controller.recordMedicalHistory(doctor, patient, record);
+        System.out.println("Medical record updated.");
     }
-
 
     private static void viewMedicalHistory(Scanner scanner, AppointmentController controller) {
-        System.out.print("Enter patient ID: ");
-        int patientId = getIntegerInput(scanner);
-        try {
-            Patient patient = controller.findPatientById(patientId);
-            System.out.println("--- Medical History for " + patient.getName() + " ---");
-            if (patient.getMedicalHistory().isEmpty()) {
-                System.out.println("No medical history found.");
-            } else {
-                for (MedicalRecord record : patient.getMedicalHistory()) {
-                    System.out.println(record);
-                }
-            }
-        } catch (PatientNotFoundException e) {
-            System.out.println("Error: " + e.getMessage());
+        Patient patient = findPatientInteractive(scanner, controller);
+        if (patient == null) return;
+
+        System.out.println("--- Medical History for " + patient.getName() + " ---");
+        if (patient.getMedicalHistory().isEmpty()) {
+            System.out.println("No medical history found.");
+        } else {
+            patient.getMedicalHistory().forEach(System.out::println);
         }
+    }
+
+    //Допоміжні методи
+
+    private static Doctor selectDoctor(Scanner scanner, AppointmentController controller) {
+        Department department = selectFromList(scanner, controller.getDepartments(), "Select a Department", Department::getName);
+        if (department == null) return null;
+
+        Doctor selectedDoctor = selectFromList(scanner, department.getDoctors(), "Select a Doctor",
+                d -> d.getName() + " (" + d.getSpecialization() + ")");
+
+        if (selectedDoctor == null) return null;
+
+        try {
+            return controller.findDoctorById(selectedDoctor.getId());
+        } catch (DoctorNotFoundException e) {
+            System.out.println("Error: " + e.getMessage());
+            return null;
+        }
+    }
+
+    private static Appointment selectAppointment(Scanner scanner, AppointmentController controller) {
+        List<Appointment> scheduledAppointments = new ArrayList<>();
+        for (Appointment appointment : controller.getAppointments()) {
+            if (appointment.getStatus() == AppointmentStatus.SCHEDULED) {
+                scheduledAppointments.add(appointment);
+            }
+        }
+
+        return selectFromList(scanner, scheduledAppointments, "Select a Scheduled Appointment",
+                app -> app.getPatient().getName() + " with " + app.getDoctor().getName() + " at " + app.getAppointmentDateTime());
+    }
+
+    private static String selectRoomInteractive(Scanner scanner, AppointmentController controller) {
+        System.out.println("--- Select an Available Room ---");
+        System.out.println("Available rooms: " + controller.getAvailableRooms());
+        System.out.print("Enter room number: ");
+        return scanner.nextLine();
+    }
+
+    private static void performActionOnAppointment(Scanner scanner, AppointmentController controller, Consumer<Appointment> action) {
+        Appointment appointment = selectAppointment(scanner, controller);
+        if (appointment != null) {
+            action.accept(appointment);
+        }
+    }
+
+    private static void printAppointmentDetails(Appointment app) {
+        System.out.println("  Patient: " + app.getPatient().getName());
+        System.out.println("  Doctor: " + app.getDoctor().getName());
+        System.out.println("  Time: " + app.getAppointmentDateTime());
+    }
+
+    private static void setupInitialData(AppointmentController controller) {
+        try {
+            controller.addPatient(new Patient(1, "John", "Doe", "123-456-7890", "John@gmail.com"));
+            controller.addPatient(new Patient(2, "Jane", "Smith", "234-444-111", "Jane@gmail.com"));
+        } catch (InvalidInputException e) {
+            System.out.println("Error setting up initial data: " + e.getMessage());
+        }
+    }
+
+    private static void printMenu() {
+        System.out.println("\n--- Hospital Management System ---");
+        System.out.println("1. Book an Appointment");
+        System.out.println("2. Cancel an Appointment");
+        System.out.println("3. Reschedule an Appointment");
+        System.out.println("4. Complete an Appointment");
+        System.out.println("5. Record Medical History");
+        System.out.println("6. View Patient Medical History");
+        System.out.println("7. Exit");
+        System.out.print("Enter your choice: ");
     }
 }
