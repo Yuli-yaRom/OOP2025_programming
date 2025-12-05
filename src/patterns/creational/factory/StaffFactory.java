@@ -6,7 +6,7 @@ import people.Doctor;
 import people.Person;
 
 public class StaffFactory {
-    public static Person createStaff(int id, String type, String name, String surname, int phone, String specialization, String email) {
+    public static Person createStaff(int id, String type, String name, String surname, String phone, String specialization, String email) {
         if ("doctor".equalsIgnoreCase(type)) {
             return new Doctor(id, name, surname, phone, specialization, email);
         }
@@ -14,7 +14,7 @@ public class StaffFactory {
         return null;
     }
 
-    public static Doctor createDoctor(int id, String name, String phone, String email, String specialization) throws InvalidInputException {
-        return new Doctor(id, name, phone, specialization, email);
+    public static Doctor createDoctor(int id, String name, String surname, String phone, String email, String specialization) throws InvalidInputException {
+        return new Doctor(id, name, surname, phone, specialization, email);
     }
 }

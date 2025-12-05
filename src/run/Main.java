@@ -232,8 +232,8 @@ public class Main {
 
     private static void setupInitialData(AppointmentController controller) {
         try {
-            controller.addPatient(new Patient(1, "John", "Doe", 123-456-7890, "John@gmail.com"));
-            controller.addPatient(new Patient(2, "Jane", "Smith", 234-444-111, "Jane@gmail.com"));
+            controller.addPatient(new Patient(1, "John", "Doe", "123-456-7890", "John@gmail.com"));
+            controller.addPatient(new Patient(2, "Jane", "Smith", "234-444-111", "Jane@gmail.com"));
         } catch (InvalidInputException e) {
             System.out.println("Error setting up initial data: " + e.getMessage());
         }

@@ -159,7 +159,7 @@ public class HospitalFacade {
 
     public Patient findPatientById(int patientId) throws PatientNotFoundException {
         for (Patient patient : patients) {
-            if (patient.getPatientId() == patientId) {
+            if (patient.getId() == patientId) {
                 return patient;
             }
         }

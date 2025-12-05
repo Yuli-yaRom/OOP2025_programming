@@ -17,7 +17,7 @@ public class Department {
     }
 
     public void addDoctor(int id, String name, String surname, String phone, String specialization, String email) {
-        Doctor newDoctor = (Doctor) StaffFactory.createStaff(id, name, surname, phone, specialization, email);
+        Doctor newDoctor = (Doctor) StaffFactory.createStaff(id, "doctor", name, surname, phone, specialization, email);
         doctors.add(newDoctor);
     }
 
