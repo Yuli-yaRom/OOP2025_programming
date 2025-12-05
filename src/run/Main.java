@@ -3,10 +3,7 @@ package run;
 import appointment.Appointment;
 import appointment.AppointmentStatus;
 import appointment.OfflineAppointment;
-import exceptions.AppointmentBookingException;
-import exceptions.DoctorNotFoundException;
-import exceptions.InvalidInputException;
-import exceptions.PatientNotFoundException;
+import exceptions.*;
 import hospital.Department;
 import hospital.MedicalRecord;
 import patterns.controller.AppointmentController;
@@ -146,11 +143,10 @@ public class Main {
             System.out.println("  Patient: " + newAppointment.getPatient().getName());
             System.out.println("  Doctor: " + newAppointment.getDoctor().getName());
             System.out.println("  Time: " + newAppointment.getAppointmentDateTime());
-        } catch (PatientNotFoundException | AppointmentBookingException e) {
+        } catch (PatientNotFoundException | AppointmentBookingException | DoctorUnavailableException e) {
             System.out.println("Error: " + e.getMessage());
         }
     }
-
 
     private static Doctor selectDoctor(Scanner scanner, AppointmentController controller) {
         System.out.println("--- Select a Department ---");

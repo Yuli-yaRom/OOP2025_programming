@@ -3,10 +3,7 @@ package patterns;
 import appointment.Appointment;
 import appointment.AppointmentStatus;
 import appointment.OfflineAppointment;
-import exceptions.AppointmentBookingException;
-import exceptions.DoctorNotFoundException;
-import exceptions.InvalidInputException;
-import exceptions.PatientNotFoundException;
+import exceptions.*;
 import hospital.Department;
 import hospital.MedicalRecord;
 import patterns.creational.abstractfabric.DepartmentFactory;
@@ -59,6 +56,10 @@ public class HospitalFacade {
     }
 
     public Appointment bookAppointment(String type, int appointmentId, Patient patient, Doctor doctor, LocalDateTime dateTime, String details, double cost) throws AppointmentBookingException {
+        if (!isDoctorAvailable(doctor, dateTime)) {
+            throw new DoctorUnavailableException("Doctor " + doctor.getName() + " is unavailable at " + dateTime);
+        }
+
         if ("offline".equalsIgnoreCase(type)) {
             return bookOfflineAppointment(appointmentId, patient, doctor, dateTime, details, cost);
         } else if ("online".equalsIgnoreCase(type)) {
@@ -86,7 +87,6 @@ public class HospitalFacade {
 
         appointment.schedule();
         appointments.add(appointment);
-        availableTimeSlots.remove(dateTime);
         return appointment;
     }
 
@@ -103,7 +103,6 @@ public class HospitalFacade {
 
         appointment.schedule();
         appointments.add(appointment);
-        availableTimeSlots.remove(dateTime);
         return appointment;
     }
 
@@ -207,6 +206,18 @@ public class HospitalFacade {
         allDoctors.addAll(cardiologyDepartment.getDoctors());
         allDoctors.addAll(pediatricsDepartment.getDoctors());
         return allDoctors;
+    }
+
+
+    private boolean isDoctorAvailable(Doctor doctor, LocalDateTime dateTime) {
+        for (Appointment appointment : appointments) {
+            if (appointment.getDoctor().getId() == doctor.getId() &&
+                    appointment.getAppointmentDateTime().equals(dateTime) &&
+                    appointment.getStatus() != AppointmentStatus.CANCELED) {
+                return false;
+            }
+        }
+        return true;
     }
 }
 
