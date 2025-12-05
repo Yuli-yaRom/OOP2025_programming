@@ -1,7 +1,7 @@
 package Test;
 import Main.hospital.Department;
 import org.junit.jupiter.api.Test;
-import Main.patterns.creational.abstractfabric.DepartmentFactory;
+import Main.patterns.creational.factory.DepartmentFactory;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -15,8 +15,8 @@ public class DepartmentFactoryTest {
         assertEquals("cardiology", cardiology.getName());
         
         // Перевіряємо, що фабрика додала лікарів за замовчуванням
-        assertFalse(cardiology.getDoctors().isEmpty(), "Відділення має містити лікарів");
-        assertEquals(2, cardiology.getDoctors().size(), "В кардіології має бути 2 лікаря за замовчуванням");
+        assertFalse(cardiology.getDoctors().isEmpty(), "Department must have a doctor");
+        assertEquals(2, cardiology.getDoctors().size(), "Cardiology must have 2 doctors by default");
         assertEquals("Cardiology", cardiology.getDoctors().getFirst().getSpecialization());
     }
 
@@ -28,7 +28,7 @@ public class DepartmentFactoryTest {
         assertEquals("pediatrics", pediatrics.getName());
         
         // Перевіряємо, що фабрика додала лікаря
-        assertEquals(1, pediatrics.getDoctors().size(), "В педіатрії має бути 1 лікар за замовчуванням");
+        assertEquals(1, pediatrics.getDoctors().size(), "Pediatrics must have 1 doctor by default");
     }
 
     @Test

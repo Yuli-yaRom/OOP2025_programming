@@ -1,4 +1,4 @@
-package Main.patterns.creational.abstractfabric;
+package Main.patterns.creational.factory;
 import Main.exceptions.InvalidInputException;
 import Main.hospital.Department;
 

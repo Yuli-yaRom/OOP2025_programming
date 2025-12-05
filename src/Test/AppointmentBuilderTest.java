@@ -44,9 +44,9 @@ public class AppointmentBuilderTest {
                 .build();
 
         // Перевірка типу об'єкта
-        assertTrue(appointment instanceof OnlineAppointment, "Має бути створений об'єкт OnlineAppointment");
+        assertTrue(appointment instanceof OnlineAppointment, "Object OnlineAppointment must be created");
 
-        // Перевірка полів (прибрали перевірку getAppointmentId)
+        // Перевірка полів
         assertEquals(patient, appointment.getPatient());
         assertEquals(doctor, appointment.getDoctor());
         assertEquals(cost, appointment.getCost(), 0.001);
@@ -69,7 +69,7 @@ public class AppointmentBuilderTest {
                 .build();
 
         // Перевірка типу об'єкта
-        assertTrue(appointment instanceof OfflineAppointment, "Має бути створений об'єкт OfflineAppointment");
+        assertTrue(appointment instanceof OfflineAppointment, "Object OfflineAppointment must be created");
 
         // Перевірка специфічного поля для офлайн запису
         assertEquals(roomNumber, ((OfflineAppointment) appointment).getRoomNumber());

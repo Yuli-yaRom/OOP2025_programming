@@ -2,7 +2,6 @@ package Main.people;
 
 import Main.appointment.Appointment;
 import Main.hospital.MedicalRecord;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,10 +15,6 @@ public class Patient extends Person {
     public List<MedicalRecord> getMedicalHistory() {
 
         return medicalHistory;
-    }
-
-    public void scheduleAppointment(Appointment appointment) {
-       //if slot is available add Main.appointment
     }
 
     public void addMedicalRecord(MedicalRecord record) {

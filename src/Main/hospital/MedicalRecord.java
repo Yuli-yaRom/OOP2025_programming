@@ -1,7 +1,7 @@
 package Main.hospital;
 import Main.people.Doctor;
 import java.time.LocalDateTime;
-
+// Медична записка (історія)
 public class MedicalRecord {
     private final LocalDateTime date;
     private final Doctor doctor;

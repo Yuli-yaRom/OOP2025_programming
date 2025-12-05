@@ -26,13 +26,14 @@ public class Run {
     public static void main(String[] args) {
         try {
             AppointmentController controller = new AppointmentController();
+            // Заповнення системи початковими даними (пацієнти, лікарі)
             setupInitialData(controller);
 
-
+            // Додавання спостерігача для отримання системних сповіщень
             Observer patientNotifier = message -> System.out.println("\n--- Patient Notification ---\n" + message);
             controller.addObserver(patientNotifier);
 
-
+            // Головний цикл програми
             try (Scanner scanner = new Scanner(System.in)) {
                 while (true) {
                     printMenu();
@@ -71,7 +72,9 @@ public class Run {
         }
     }
 
-
+    /**
+     * метод для отримання числа (цілого) від користувача
+     */
     private static int getIntegerInput(Scanner scanner) {
         while (true) {
             try {
@@ -98,9 +101,11 @@ public class Run {
         System.out.print("Enter your choice: ");
     }
 
-
+    /**
+     * Обробляє логіку запису на новий прийом
+     */
     private static void bookAppointment(Scanner scanner, AppointmentController controller) {
-        System.out.print("Enter Main.appointment type (online/offline): ");
+        System.out.print("Enter appointment type (online/offline): ");
         String type = scanner.nextLine();
         System.out.print("Enter patient ID: ");
         int patientId = getIntegerInput(scanner);
@@ -176,7 +181,9 @@ public class Run {
         }
     }
 
-
+    /**
+     * метод для вибору запланованого прийому зі списку
+     */
     private static Appointment selectAppointment(Scanner scanner, AppointmentController controller) {
         System.out.println("--- Select a Scheduled Appointment ---");
         List<Appointment> scheduledAppointments = new ArrayList<>();
@@ -196,16 +203,18 @@ public class Run {
             System.out.println(i++ + ". " + appointment.getPatient().getName() + " with " + appointment.getDoctor().getName() + " at " + appointment.getAppointmentDateTime() + " (" + appointment.getStatus() + ")");
         }
 
-        System.out.print("Enter Main.appointment number: ");
+        System.out.print("Enter appointment number: ");
         int appointmentNumber = getIntegerInput(scanner);
         if (appointmentNumber < 1 || appointmentNumber > scheduledAppointments.size()) {
-            System.out.println("Invalid Main.appointment number.");
+            System.out.println("Invalid appointment number.");
             return null;
         }
         return scheduledAppointments.get(appointmentNumber - 1);
     }
 
-
+    /**
+     * Записує історію хвороби пацієнта
+     */
     private static void recordMedicalHistory(Scanner scanner, AppointmentController controller) {
         System.out.print("Enter patient ID: ");
         int patientId = getIntegerInput(scanner);
@@ -301,7 +310,7 @@ public class Run {
         });
     }
 
-
+    // Допоміжні методи для відображення
     private static void listDepartments(AppointmentController controller) {
         int i = 1;
         for (Department department : controller.getDepartments()) {

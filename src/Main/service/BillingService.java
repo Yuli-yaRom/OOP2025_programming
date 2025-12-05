@@ -1,5 +1,5 @@
 package Main.service;
-// Charge patient for completed Main.appointment
+// Оплата за пройдений прийом
 
 public interface BillingService {
     double calculateCost();

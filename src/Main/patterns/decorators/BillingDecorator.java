@@ -1,6 +1,4 @@
 package Main.patterns.decorators;
-
-
 import Main.service.BillingService;
 
 public abstract class BillingDecorator implements BillingService {

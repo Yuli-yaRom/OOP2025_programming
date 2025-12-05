@@ -6,7 +6,7 @@ import Main.appointment.OfflineAppointment;
 import Main.exceptions.*;
 import Main.hospital.Department;
 import Main.hospital.MedicalRecord;
-import Main.patterns.creational.abstractfabric.DepartmentFactory;
+import Main.patterns.creational.factory.DepartmentFactory;
 import Main.patterns.decorators.AppointmentBilling;
 import Main.patterns.decorators.InsuranceDecorator;
 import Main.patterns.observer.AppointmentNotifier;
@@ -65,7 +65,7 @@ public class HospitalFacade {
         } else if ("online".equalsIgnoreCase(type)) {
             return bookOnlineAppointment(appointmentId, patient, doctor, dateTime, details, cost);
         } else {
-            throw new IllegalArgumentException("Invalid Main.appointment type: " + type);
+            throw new IllegalArgumentException("Invalid appointment type: " + type);
         }
     }
 

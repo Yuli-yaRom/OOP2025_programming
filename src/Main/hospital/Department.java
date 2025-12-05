@@ -1,5 +1,5 @@
 package Main.hospital;
-
+// Клас відділів лікарні
 import Main.patterns.creational.factory.StaffFactory;
 import Main.people.Doctor;
 

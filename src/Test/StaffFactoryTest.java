@@ -20,8 +20,8 @@ public class StaffFactoryTest {
 
         Person staff = StaffFactory.createStaff(id, "doctor", name, surname, phone, specialization, email);
 
-        assertNotNull(staff, "Співробітник не повинен бути null");
-        assertTrue(staff instanceof Doctor, "Створений об'єкт має бути класу Doctor");
+        assertNotNull(staff, "Staff member must not be null");
+        assertTrue(staff instanceof Doctor, "Created object must be an instance of Doctor");
 
         Doctor doctor = (Doctor) staff;
         assertEquals(name, doctor.getName());
@@ -32,7 +32,7 @@ public class StaffFactoryTest {
     void createStaff_ReturnsNull_WhenTypeIsUnknown() {
         Person staff = StaffFactory.createStaff(2, "nurse", "Jane", "Doe", "333-444", "General", "jane@example.com");
 
-        assertNull(staff, "Для невідомого типу має повертатися null (поки Nurse не реалізовано)");
+        assertNull(staff, "Null must be returned for unknown type (Nurse not added yet)");
     }
 
     @Test
